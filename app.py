@@ -5,10 +5,10 @@ from main import (PromptGenerator, extract_text,
 
 
 def save_and_download_text(text, filename="download.txt"):
-    with open(filename, 'w') as f:
+    with open(filename, 'w', encoding='utf-8') as f:
         f.write(text)
     # Provide a download button
-    with open(filename, "r") as f:
+    with open(filename, "r", encoding='utf-8') as f:
         st.download_button(
             label="Download Text File",
             data=f,
@@ -42,7 +42,7 @@ with st.sidebar:
 
         prompt_gen = PromptGenerator(
                     blog=input_text,
-                    keyword=keywords.split(','),
+                    keyword=keywords,
                     instructions=instruction)
 
         messages = prompt_gen.generate()
