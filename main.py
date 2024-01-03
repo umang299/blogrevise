@@ -18,12 +18,12 @@ class PromptGenerator:
         self.blog = blog if blog is not None else ''
 
         if keyword is not None:
-            assert type(keyword) is list
+            assert type(keyword) is str
             self.keyword = keyword
         else:
-            self.keyword = ['']
+            self.keyword = ''
 
-        self.instruction = instructions if instructions is not None else ''
+        self.instruction = instructions
         self.sys_prompt = self._read_from_file(file_path='prompt.txt')
         self.sys_prompt = self._append_keywords()
         self.sys_prompt = self._append_instructions()
@@ -34,17 +34,25 @@ class PromptGenerator:
         return text
 
     def _append_keywords(self):
-        keyword_string = ",".join(self.keyword)
-        self.sys_prompt = self.sys_prompt.replace(
-            "<<KEYWORDS>>", keyword_string
+        if self.keyword == '':
+            return self.sys_prompt
+        else:
+            self.sys_prompt = self.sys_prompt.replace(
+                "<<KEYWORDS>>", self.keyword
             )
-        return self.sys_prompt
+            return self.sys_prompt
 
     def _append_instructions(self):
-        self.sys_prompt = self.sys_prompt.replace(
-            "<<INSTRUCTIONS>>", self.instruction
+        if self.instruction is not None:
+            self.sys_prompt = self.sys_prompt.replace(
+                "<<INSTRUCTIONS>>", self.instruction
             )
-        return self.sys_prompt
+            return self.sys_prompt
+        else:
+            self.sys_prompt = self.sys_prompt.replace(
+                "<<INSTRUCTIONS>>", ''
+            )
+            return self.sys_prompt
 
     def generate(self):
         messages = [
@@ -62,7 +70,9 @@ def get_response(model: str = None, message: str = None):
             model = "gpt-4-1106-preview"
             response = client.chat.completions.create(
                             model="gpt-4-1106-preview",
-                            messages=message
+                            messages=message,
+                            frequency_penalty=1,
+                            temperature=0.2
                             )
             return response.choices[0].message.content
         else:
