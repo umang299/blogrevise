@@ -50,10 +50,3 @@ class BlogOutline(ft.UserControl):
                         self.buttons
                     ],
                 )
-
-
-def main(page: ft.Page):
-    page.add(BlogOutline())
-
-
-ft.app(target=main)
