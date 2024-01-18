@@ -1,3 +1,5 @@
+import os
+import shutil
 import flet as ft
 
 from components import define_title
@@ -6,6 +8,15 @@ from config import OutlineHome, GeneratePage
 if __name__ == '__main__':
     def main(page: ft.Page):
         page.title = 'Home'
+        location = ft.Text()
+
+        def picker_fn(e: ft.FilePickerResultEvent):
+            for file in e.files:
+                shutil.copy(file.name, os.path.join('uploads', file.name))
+                location.value = f"Saved file at {os.path.join('uploads', file.name)}"
+                location.update()
+
+        file_picker = ft.FilePicker(on_result=picker_fn)
 
         def route_change(route):
             page.views.clear()
@@ -117,6 +128,36 @@ if __name__ == '__main__':
 
                     )
                 )
+            if page.route == '/upload':
+                page.overlay.append(file_picker)
+                page.views.append(
+                    ft.View(
+                        route='/upload',
+                        controls=[
+                                ft.Row(
+                                    controls=[
+                                        ft.Text(
+                                            value='Upload your blog outline',
+                                            size=26,
+                                            font_family='Open Sans',
+                                            text_align=ft.MainAxisAlignment.CENTER
+                                        )
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER
+                                ),
+
+                                ft.Row([
+                                    ft.ElevatedButton(
+                                        'Upload File',
+                                        on_click=lambda _: file_picker.pick_files()
+                                        ),
+                                    location
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER
+                                )
+                        ]
+                    )
+                )
             page.update()
 
         def view_pop(view):
@@ -129,4 +170,4 @@ if __name__ == '__main__':
         page.go(page.route)
 
 
-ft.app(target=main, view=ft.AppView.WEB_BROWSER)
+ft.app(target=main)
