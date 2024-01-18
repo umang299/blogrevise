@@ -1,7 +1,7 @@
 import flet as ft
 
 from components import define_title
-from config import OutlineHome
+from config import OutlineHome, GeneratePage
 
 if __name__ == '__main__':
     def main(page: ft.Page):
@@ -76,8 +76,8 @@ if __name__ == '__main__':
                         controls=[
                             ft.Text(
                                 value='Topic',
-                                size=18,
-                                font_family='Open Sans'
+                                size=GeneratePage.BUTTON_TEXT_SIZE.value,
+                                font_family=GeneratePage.TEXT_STYLE.value
                             ),
 
                             ft.TextField(label='Topic name'),
@@ -85,12 +85,12 @@ if __name__ == '__main__':
                             ft.Row(
                                 controls=[
                                     ft.ElevatedButton(
-                                            width=200,
-                                            height=50,
+                                            width=GeneratePage.BUTTON_WIDTH.value,
+                                            height=GeneratePage.BUTON_HEIGT.value,
                                             content=ft.Row(controls=[
                                                 ft.Text(
                                                     value='Generate',
-                                                    size=18,
+                                                    size=GeneratePage.BUTTON_TEXT_SIZE.value,
                                                     style=ft.TextThemeStyle.LABEL_MEDIUM)
                                                 ],
                                                 alignment=ft.MainAxisAlignment.CENTER)
@@ -105,11 +105,11 @@ if __name__ == '__main__':
                                 scroll=ft.ScrollMode.ALWAYS,
                                 controls=[
                                     ft.TextField(
-                                            width=1500,
-                                            height=500,
+                                            width=GeneratePage.TEXT_FIELD_WIDTH.value,
+                                            height=GeneratePage.TEST_FIELD_HEIGHT.value,
                                             multiline=True,
                                             autocorrect=True,
-                                            border_radius=2
+                                            border_radius=GeneratePage.BORDER_RADIUS.value
                                         )
                                     ],
                             )
