@@ -14,3 +14,14 @@ class OutlineHome(Enum):
     BUTTON_WIDTH = 340
     BUTTON_HEIGHT = 138
     ALIGNMENT = Alignment.CENTER
+
+
+class GeneratePage(Enum):
+    BUTTON_WIDTH = 200
+    BUTON_HEIGT = 50
+    BUTTON_TEXT_SIZE = 18
+    TEXT_STYLE = 'Open Sans'
+
+    TEXT_FIELD_WIDTH = 1500
+    TEST_FIELD_HEIGHT = 500
+    BORDER_RADIUS = 2
