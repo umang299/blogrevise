@@ -1,0 +1,13 @@
+credentials:
+  usernames:
+    umang:
+      email: umang91999@gmail.com
+      name: Umang Agarwal
+      password: umang123456 # To be replaced with hashed password
+cookie:
+  expiry_days: 1
+  key: some_signature_key # Must be string
+  name: some_cookie_name
+preauthorized:
+  emails:
+  - melsby@gmail.com
