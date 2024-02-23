@@ -1,0 +1,4 @@
+database:
+  outline:
+    tablename: BlogOutlines
+    categoryname: Category
