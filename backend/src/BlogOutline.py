@@ -1,51 +1,42 @@
+import os
+import sys
 import yaml
+import openai
 import sqlite3
 from uuid import uuid4
 from datetime import datetime
 
 
-def load_yaml_file(file_path):
-    """
-    Load data from a YAML file.
+api_key = os.environ['OPENAI_API_KEY']
+openai.api_key = api_key
 
-    Parameters:
-        file_path (str): The path to the YAML file.
+cwd = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(cwd)
 
-    Returns:
-        dict: The data loaded from the YAML file.
-    """
-    try:
-        with open(file_path, 'r') as file:
-            data = yaml.safe_load(file)
-        return data
-    except FileNotFoundError:
-        print(f"File '{file_path}' not found.")
-        return None
-    except Exception as e:
-        print(f"Error occurred while loading YAML file: {e}")
-        return None
+from .utils import (load_yaml_file, read_text_file)
 
 
 class BlogOutline:
     def __init__(self) -> None:
-        try:
-            self.conn = sqlite3.connect('backend\\database\\database.db')
-            self.cursor = self.conn.cursor()
-            print("Connection to database successful.")
-
-            self.config = load_yaml_file(file_path='backend\\config.yaml')
-            self.outline_db_name = self.config['database']['outline']['tablename']
-            self.outline_category_db_name = self.config['database']['outline']['categoryname']
-
-        except sqlite3.Error as e:
-            print(f"Error connecting to database: {e}")
+        self.db_path = os.path.join(cwd, 'database', 'database.db')
+        self.config = load_yaml_file(
+                    file_path=os.path.join(
+                                cwd, 'config.yaml'
+                                )
+                    )
+        self.outline_db_name = self.config['database']['outline']['tablename']
+        self.outline_category_db_name = self.config['database']['outline']['categoryname']
 
     def create_outline_table(self):
-        self.cursor.execute(f"""
+        conn = sqlite3.connect(self.db_path)
+        cur = conn.cursor()
+        print("Connection to database successful.")
+
+        cur.execute(f"""
                 SELECT name FROM sqlite_master WHERE type='table'
                 AND name='{self.outline_db_name}'""")
 
-        table_exists = self.cursor.fetchone()
+        table_exists = cur.fetchone()
 
         if table_exists:
             print(f"Table '{self.outline_db_name}' already exists.")
@@ -68,11 +59,17 @@ class BlogOutline:
             """)
             print(f"Table '{self.outline_db_name}' created successfully.")
 
+        conn.close()
+
     def create_category_table(self):
-        self.cursor.execute(f"""
+        conn = sqlite3.connect(self.db_path)
+        cur = conn.cursor()
+        print("Connection to database successful.")
+
+        cur.execute(f"""
                 SELECT name FROM sqlite_master WHERE type='table'
                 AND name='{self.outline_category_db_name}'""")
-        table_exists = self.cursor.fetchone()
+        table_exists = cur.fetchone()
 
         if table_exists:
             print(f"Table '{self.outline_category_db_name}' already exists.")
@@ -86,9 +83,15 @@ class BlogOutline:
             print(f"Table '{self.outline_category_db_name}' \
                   created successfully.")
 
+        conn.close()
+
     def upload_blog_data(self, blog_data):
         try:
-            self.cursor.execute("""
+            conn = sqlite3.connect(self.db_path)
+            cur = conn.cursor()
+            print("Connection to database successful.")
+
+            cur.execute("""
                 INSERT INTO BlogOutlines
                 (UserID, Title, Topic, Instructions,
                 Filename, IsUploaded, Version, CategoryID)
@@ -100,15 +103,34 @@ class BlogOutline:
                 blog_data['CategoryID'])
                 )
 
-            self.conn.commit()
+            conn.commit()
+            conn.close()
             print("Blog data uploaded successfully!")
         except sqlite3.Error as e:
             print("Error uploading blog data:", e)
 
     def get_outline_filenames_by_user_id(self, user_id):
-        self.cursor.execute("""
+        conn = sqlite3.connect(self.db_path)
+        cur = conn.cursor()
+        # print("Connection to database successful.")
+        cur.execute("""
                 SELECT Filename FROM BlogOutlines WHERE UserID = ?
                 """, (user_id,))
-        rows = self.cursor.fetchall()
+        rows = cur.fetchall()
         filenames = [row[0] for row in rows]
+
+        conn.close()
         return filenames
+
+    def generate_outline(self, topic, instructions):
+        prompt_template = read_text_file(
+                            file_path=os.path.join(
+                                        cwd, 'prompts', 'blog_outline.txt'))
+        prompt = prompt_template.replace('<<TOPIC>>', topic)
+        prompt = prompt_template.replace('<<INSTRUCTIONS>>', instructions)
+        response = openai.chat.completions.create(
+                            messages=[{'role' : 'user', 'content' : prompt}],
+                            model='gpt-4',
+                            temperature=2)
+
+        return response.choices[0].message.content
