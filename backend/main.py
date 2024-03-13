@@ -1,5 +1,7 @@
 import yaml
 from fastapi import FastAPI
+
+from src.aws import AWSClient
 from src.BlogOutline import BlogOutline
 
 with open('config.yaml', 'r') as f:
@@ -7,6 +9,7 @@ with open('config.yaml', 'r') as f:
 
 app = FastAPI()
 outline_manager = BlogOutline()
+aws_manager = AWSClient(config=config)
 
 
 @app.get('/generate_blog')
@@ -16,3 +19,18 @@ def generate_blog(topic: str, instructions: str):
                                     instructions=instructions
                                 )
     return {'outline': outline}
+
+
+@app.post("/upload_to_s3")
+async def upload_to_s3(text, filename):
+    status, saved_filename = aws_manager.upload_file(
+                                            text=text,
+                                            filename=filename
+                                        )
+    if status:
+        return {
+            'status': status,
+            'filename': saved_filename
+        }
+    else:
+        return {'status': status}

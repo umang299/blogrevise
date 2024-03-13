@@ -1,4 +1,7 @@
+url: http://127.0.0.1:8000
 database:
   outline:
     tablename: BlogOutlines
     categoryname: Category
+aws:
+  bucket_name: blogrevise
