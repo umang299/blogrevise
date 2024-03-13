@@ -1,0 +1,2 @@
+Create a blog content outline for <<TOPIC>> based on the below instructions provided by the user.
+<<INSTRUCTIONS>>
