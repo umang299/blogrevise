@@ -19,8 +19,8 @@ jobs:
 
     # Run tests
     - name: Run tests
-      run: python -m unittest discover -s test
+      run: python -m unittest discover -s tests
 
     # Run linting
     - name: Run linting
-      run: flake8 src test
+      run: flake8 src tests
