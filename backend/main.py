@@ -13,7 +13,7 @@ aws_manager = AWSClient(config=config)
 
 
 @app.get('/generate_blog')
-def generate_blog(topic: str, instructions: str):
+async def generate_blog(topic: str, instructions: str):
     outline = outline_manager.generate_outline(
                                     topic=topic,
                                     instructions=instructions
