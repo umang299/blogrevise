@@ -2,9 +2,9 @@ name: Makefile CI
 
 on:
   push:
-    branches: [ "backend-api" ]
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "backend-api" ]
+    branches: [ "develop" ]
 
 jobs:
   build:
