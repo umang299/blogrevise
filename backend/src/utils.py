@@ -1,6 +1,7 @@
 import io
 import docx
 import yaml
+import json
 import PyPDF2
 
 
@@ -68,3 +69,15 @@ def extract_text(uploaded_file):
 
     else:
         return "Unsupported file format"
+
+
+def save_dict_to_json(data, file_path):
+    """
+    Save a dictionary to a JSON file.
+
+    Args:
+        data (dict): The dictionary to be saved.
+        file_path (str): The file path where the JSON file will be saved.
+    """
+    with open(file_path, 'w') as json_file:
+        json.dump(data, json_file, indent=4)
