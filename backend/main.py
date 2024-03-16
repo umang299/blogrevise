@@ -1,11 +1,13 @@
+import os
 import yaml
+from uuid import uuid4
 from fastapi import FastAPI
 
 from src.aws import AWSClient
+from src.utils import load_yaml_file, save_json_file
 from src.BlogOutline import BlogOutline
 
-with open('config.yaml', 'r') as f:
-    config = yaml.safe_load(f)
+config = load_yaml_file(file_path='config.yaml')
 
 app = FastAPI()
 outline_manager = BlogOutline()
@@ -18,7 +20,21 @@ async def generate_blog(topic: str, instructions: str):
                                     topic=topic,
                                     instructions=instructions
                                 )
-    return {'outline': outline}
+
+    result = {'topic': topic,
+              'instructions': instructions,
+              'outline': outline}
+
+    filename = save_json_file(
+                        data=result,
+                        filename=os.path.join(
+                                os.getcwd(), 'data', f'{uuid4()}.json')
+                    )
+
+    return {
+        'outline': outline,
+        'filename': filename
+        }
 
 
 @app.post("/upload_to_s3")
